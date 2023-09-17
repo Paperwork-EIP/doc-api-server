@@ -1,4 +1,5 @@
 ---
+
 swagger: '2.0'
 info:
   title: Paperwork - API Documentation
@@ -36,6 +37,8 @@ tags:
     description: ProcessProposal management.
   - name: contact
     description: Contact paperwork.
+  - name: admin
+    description: Administrator routes.
 
 paths:
   /user/register:
@@ -243,7 +246,7 @@ paths:
             properties:
               token:
                 type: string
-                example: userTokenExemple
+                example: userTokenExample
               new_email:
                 type: string
                 example: test@test.test
@@ -393,6 +396,50 @@ paths:
       summary: Reset password.
       tags:
           - user
+  /user/mobileLogin:
+    post:
+      parameters:
+        - in: body
+          name: User data
+          description: The user data to create / login.
+          schema:
+            type: object
+            required:
+              - id
+              - email
+              - access_token
+              - oauth
+            properties:
+              id:
+                type: integer
+                example: 1
+              email:
+                type: string
+                example: test@test.test
+              access_token:
+                type: string
+                example: token
+              oauth:
+                type: string
+                example: google
+      responses:
+        '200':
+          description: Connected with google or facebook
+          schema:
+            type: object
+            example:
+              {
+                "message": "Connected with google or facebook",
+                "email": "test@test.test",
+                "jwt": "token here"
+              }
+        '400':
+          description: Missing params.
+        '500':
+          description: Connection with google or facebook failed.
+      summary: Login with oauth for mobile.
+      tags:
+        - user
   /oauth/google/urlLogin:
     get:
       responses:
@@ -586,16 +633,18 @@ paths:
               {
                 "questions": [
                   {
-                      step_id: 1,
-                      question: "stepQuestion1"
+                    "step_id": 1,
+                    "question": "Do you know wich type of visa you need?"
                   },
                   {
-                      step_id: 2,
-                      question: "stepQuestion2"
-                  },
-                  {
-                      step_id: 3,
-                      question: "stepQuestion3"
+                    "step_id": 2,
+                    "question": "Do you have a complete file for your visa application?",
+                    "underQuestions": [
+                      {
+                        "step_id": 2,
+                        "question": "Do you have a valid passport?"
+                      }
+                    ]
                   }
                 ]
               }
@@ -627,14 +676,21 @@ paths:
                 description: Title of the process of the step.
               user_token:
                 type: string
-                example: userTokenExemple
+                example: userTokenExample
               questions:
                 type: object
                 example:
                   [
                     {
                       step_id: id,
-                      response: false
+                      response: false,
+                      underQuestions: [
+                        {
+                            step_id: id,
+                            response: false
+                        },
+                        ...
+                      ]
                     },
                     ...
                   ]
@@ -672,14 +728,21 @@ paths:
                 description: Title of the process of the steps to change.
               user_token:
                 type: string
-                example: userTokenExemple
+                example: userTokenExample
               questions:
                 type: object
                 example:
                   [
                     {
                       step_id: id,
-                      response: true
+                      response: false,
+                      "underQuestions":
+                      [
+                          {
+                              "id": id,
+                              "response": true
+                          }
+                      ]  
                     },
                     ...
                   ]
@@ -739,25 +802,27 @@ paths:
               {
                 "message": "User process steps",
                 "id": 1,
-                "title": "ProcessTitle",
-                "pourcentage": 33,
-                "response":
-                [
+                "title": "Long-term visa.",
+                "pourcentage": 0,
+                "response": [
                   {
-                      "id": 1,
-                      "step_id": 1,
-                      "step_title": "stepTitle1",
-                      "step_type": "stepType",
-                      "step_description": "stepDescription",
-                      "step_source": "stepSource",
-                      "is_done": false,
-                      "start_date": "2052-12-29T00:00:00.000Z",
-                      "end_date": null,
-                      "delay": "2052-12-29T00:00:00.000Z",
-                      "appoinment": null,
-                      "user_process_id": 2
-                  },
-                  ...
+                    "step_id": 1,
+                    "title": "Step title",
+                    "description": "Step description",
+                    "type": "Document",
+                    "source": "link",
+                    "is_done": false,
+                    "under_steps": [
+                      {
+                        "id": 1,
+                        "title": "Under step title",
+                        "description": "Under step description",
+                        "type": "Document",
+                        "source": "link",
+                        "is_done": false
+                      }
+                    ]
+                  }
                 ]
               }
         '400':
@@ -785,25 +850,27 @@ paths:
               {
                 "message": "User process steps",
                 "id": 1,
-                "title": "ProcessTitle",
-                "pourcentage": 33,
-                "response":
-                [
+                "title": "Long-term visa.",
+                "pourcentage": 0,
+                "response": [
                   {
-                      "id": 1,
-                      "step_id": 1,
-                      "step_title": "stepTitle1",
-                      "step_type": "stepType",
-                      "step_description": "stepDescription",
-                      "step_source": "stepSource",
-                      "is_done": false,
-                      "start_date": "2052-12-29T00:00:00.000Z",
-                      "end_date": null,
-                      "delay": "2052-12-29T00:00:00.000Z",
-                      "appoinment": null,
-                      "user_process_id": 2
-                  },
-                  ...
+                    "step_id": 1,
+                    "title": "Step title",
+                    "description": "Step description",
+                    "type": "Document",
+                    "source": "link",
+                    "is_done": false,
+                    "under_steps": [
+                      {
+                        "id": 1,
+                        "title": "Under step title",
+                        "description": "Under step description",
+                        "type": "Document",
+                        "source": "link",
+                        "is_done": false
+                      }
+                    ]
+                  }
                 ]
               }
         '400':
@@ -829,18 +896,16 @@ paths:
             type: object
             example:
               {
-                "message": "User processes",
-                "response": [
-                    {
-                      "id": 1,
-                      "process_id": 1,
-                      "title": "Visa long séjour",
-                      "description": "ExampleDescription",
-                      "source": "link",
-                      "stocked_title": "Visa",
-                    },
-                    ...
-                ]
+                "pourcentage": 0,
+                "userProcess": {
+                  "id": 1,
+                  "process_id": 1,
+                  "title": "Title",
+                  "description": "Description",
+                  "source": "Link",
+                  "stocked_title": "stocked_title",
+                  "is_done": false
+                }
               }
         '400':
           description: Missing parameters.
@@ -1020,7 +1085,7 @@ paths:
             properties:
               user_token:
                 type: string
-                example: UserTokenExemple
+                example: UserTokenExample
               title:
                 type: string
                 example: Title examole
@@ -1118,3 +1183,319 @@ paths:
       summary: Send an email to the Paperwork development team.
       tags:
         - contact
+  /admin/create:
+    post:
+      summary: "Create a new process"
+      description: "Creates a new process with the given title and content."
+      tags:
+        - admin
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: body
+          name: New process
+          description: Add a new given process.
+          schema:
+            type: object
+            required:
+              - title
+              - content
+            properties:
+              title:
+                type: string
+                example: title
+              delay:
+                type: string
+                example: "YYYY-MM-DD, For example the visa last one year so it's : 0001-00-00"
+              content:
+                type: object
+                example:
+                  {
+                    "english": {
+                      "title": "Example",
+                      "description": "Description example",
+                      "source": "link",
+                      "steps": [
+                        {
+                          "title": "Step1",
+                          "type": "Document",
+                          "description": "Description of the step",
+                          "question": "Question of the step ?",
+                          "source": "Link",
+                          "underQuestions": [
+                            {
+                              "title": "Under question example",
+                              "type": "Document",
+                              "description": "Under question description",
+                              "question": "Question ?",
+                              "source": "link"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  }
+      responses:
+        '200':
+          description: Result details
+          schema:
+            type: object
+            example:
+              {
+                "message": "Process created!",
+                "response": {
+                    "id": 21,
+                    "title": "test"
+                },
+                "steps": [
+                    {
+                        "id": 18
+                    },
+                    {
+                        "id": 19
+                    },
+                    {
+                        "id": 20
+                    },
+                    {
+                        "id": 21
+                    }
+                ]
+              }
+        '400':
+          description: "Bad Request - Title or content missing or process already exists"
+        '409':
+          description: "Bad Request - Process already exists"
+        '500':
+          description: "Internal Server Error - System error or error writing file"
+  /admin/modifyProcess:
+    post:
+      description: "Modify the informations of a process for a given language."
+      summary: "Modify one process informations"
+      tags:
+        - admin
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: body
+          name: Process
+          description: Modify the process informations.
+          schema:
+            type: object
+            required:
+              - stocked_title
+              - language
+            properties:
+              stocked_title:
+                type: string
+                example: stocked_title
+              language:
+                type: string
+                example: english
+              title:
+                type: string
+                example: New title
+              description:
+                type: string
+                example: New description
+              source:
+                type: string
+                example: New link
+              delay:
+                type: string
+                example: "YYYY-MM-DD, For example the visa last one year so it's : 0001-00-00"
+      responses:
+        '200':
+          description: Result details
+          schema:
+            type: object
+            example:
+              {
+                "message": "Process modified!",
+                "process_id": 20,
+                "process_title": "test"
+              }
+        '400':
+          description: "Bad Request - Missing parameters."
+        '404':
+          description: "Process not found."
+        '500':
+          description: "System error."
+  /admin/updateStep:
+    post:
+      description: "Modify the informations of a process for a given language."
+      summary: "Modify one process informations"
+      tags:
+        - admin
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: body
+          name: Process
+          description: Modify the process informations.
+          schema:
+            type: object
+            required:
+              - stocked_title
+              - step_id
+              - language
+            properties:
+              stocked_title:
+                type: string
+                example: stocked_title
+              step_id:
+                type: integer
+                example: 1
+              language:
+                type: string
+                example: english
+              title:
+                type: string
+                example: New title
+              description:
+                type: string
+                example: New description
+              source:
+                type: string
+                example: New link
+              is_unique:
+                type: boolean
+                example: True or false
+      responses:
+        '200':
+          description: Result details
+          schema:
+            type: object
+            example:
+              {
+                "message": "Step updated!",
+                "stocked_title": "test",
+                "step": {
+                    "title": "New title",
+                    "type": "New type",
+                    "description": "New description",
+                    "question": "New auestion",
+                    "source": "New link",
+                    "underQuestions": [...]
+                }
+            }
+        '400':
+          description: Missing parameters.
+        '404':
+          description: Process, target step, steps, language or data not found
+        '500':
+          description: System error or error writing file.
+  /admin/getProcess:
+    get:
+      description: "Get a process data."
+      summary: "Get process"
+      tags:
+        - admin
+      parameters:
+        - in: query
+          name: stocked_title
+          type: string
+          description: Stocked_title of the process to get.
+      responses:
+        '200':
+          description: Process found!
+          schema:
+            type: object
+            example:
+              {
+                "message": "Process found!",
+                "stocked_title": "title",
+                "process": [
+                    {
+                        "language": "english",
+                        "content": {
+                            "title": "Title",
+                            "description": "Description",
+                            "source": "Link"
+                        }
+                    }
+                ]
+            }
+        '400':
+          description: Missing parameters.
+        '404':
+          description: Process not found.
+        '500':
+          description: System error or error reading file.
+  /admin/getStep:
+    get:
+      description: "Get a step data."
+      summary: "Get step"
+      tags:
+        - admin
+      parameters:
+        - in: query
+          name: stocked_title
+          type: string
+          description: Stocked_title of the process that contains to the target step.
+        - in: query
+          name: step_id
+          type: integer
+          description: Id of the step.
+      responses:
+        '200':
+          description: Process found!
+          schema:
+            type: object
+            example:
+              {
+                "message": "Steps found!",
+                "stocked_title": "title",
+                "step": [
+                    {
+                        "language": "english",
+                        "step_id": 29,
+                        "number": "0",
+                        "content": {
+                            "title": "New title",
+                            "type": "Document",
+                            "description": "New description",
+                            "question": "Question of the step ?",
+                            "source": "New link"
+                        }
+                    }
+                ]
+            }
+        '400':
+          description: Missing parameters.
+        '404':
+          description: Process, target step, steps or data not found
+        '500':
+          description: System error.
+  /admin/deleteProcess:
+    get:
+      description: Delete a process.
+      summary: Delete
+      tags:
+        - admin
+      parameters:
+        - in: query
+          name: title
+          type: string
+          description: Stocked_title of the process to delete.
+      responses:
+        '200':
+          description: Process found!
+          schema:
+            type: object
+            example:
+              {
+                "message": "Process and steps deleted!"
+              }
+        '400':
+          description: Missing parameters.
+        '404':
+          description: Process not found.
+        '500':
+          description: System error or Error deleting file.
