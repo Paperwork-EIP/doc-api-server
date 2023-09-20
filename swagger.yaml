@@ -1,5 +1,4 @@
 ---
-
 swagger: '2.0'
 info:
   title: Paperwork - API Documentation
@@ -1367,6 +1366,16 @@ paths:
               is_unique:
                 type: boolean
                 example: True or false
+              underQuestions:
+                type: object
+                example:
+                  [
+                    {
+                      "id": 1,
+                      "title": "test",
+                      "description": "testest"
+                    }
+                  ]
       responses:
         '200':
           description: Result details
@@ -1451,22 +1460,33 @@ paths:
             example:
               {
                 "message": "Steps found!",
-                "stocked_title": "title",
-                "step": [
-                    {
-                        "language": "english",
-                        "step_id": 29,
-                        "number": "0",
-                        "content": {
-                            "title": "New title",
-                            "type": "Document",
-                            "description": "New description",
-                            "question": "Question of the step ?",
-                            "source": "New link"
-                        }
+                "stocked_title": "Visa",
+                "step":
+                [
+                  {
+                    "language": "english",
+                    "step_id": 4,
+                    "number": "1",
+                    "content": {
+                        "title": "Title",
+                        "type": "Document",
+                        "description": "Description.",
+                        "question": "Question",
+                        "source": "link",
+                        "underQuestions": [
+                          {
+                              "id": 0,
+                              "title": "Title",
+                              "type": "Document",
+                              "description": "Description.",
+                              "source": "link",
+                              "question": "question"
+                          }
+                        ]
+                      }
                     }
                 ]
-            }
+              }
         '400':
           description: Missing parameters.
         '404':
