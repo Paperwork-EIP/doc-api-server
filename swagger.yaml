@@ -9,7 +9,7 @@ info:
     url: http://www.apache.org/licenses/LICENSE-2.0.html
   contact: 
     name: Paperwork Team
-    url: http://eip.epitech.eu/2024/paperwork
+    url: https://www.paperwork-fr.com/
     email: paperwork_2024@labeip.epitech.eu
 host: 'localhost:8282'
 basePath: /
@@ -1574,15 +1574,19 @@ paths:
           schema:
             type: object
             required:
+              - token
               - stocked_title
               - content
             properties:
+              token:
+                type: string
+                example: admin user token
               stocked_title:
                 type: string
                 example: title
               delay:
                 type: string
-                example: "YYYY-MM-DD, For example the visa last one year so it's : 0001-00-00"
+                example: "YYYY-MM-DD, For example, the visa lasts one year, so it's: 0001-00-00"
               content:
                 type: object
                 example:
@@ -1596,14 +1600,14 @@ paths:
                           "title": "Step1",
                           "type": "Document",
                           "description": "Description of the step",
-                          "question": "Question of the step ?",
+                          "question": "Question of the step?",
                           "source": "Link",
                           "underQuestions": [
                             {
                               "title": "Under question example",
                               "type": "Document",
                               "description": "Under question description",
-                              "question": "Question ?",
+                              "question": "Question?",
                               "source": "link"
                             }
                           ]
@@ -1640,14 +1644,17 @@ paths:
               }
         '400':
           description: "Bad Request - Title or content missing or process already exists"
+        '403':
+          description: Unauthorized.
         '409':
           description: "Bad Request - Process already exists"
         '500':
           description: "Internal Server Error - System error or error writing file"
+
   /admin/process/addLanguage:
     post:
       summary: "Add a new language to a process"
-      description: "Add a new language to the process with the given title, description and source, the step are copied in english."
+      description: "Add a new language to the process with the given title, description, and source, the steps are copied in English."
       tags:
         - adminProcess
       consumes:
@@ -1661,12 +1668,16 @@ paths:
           schema:
             type: object
             required:
+              - token
               - stocked_title
               - language
               - title
               - description
               - source
             properties:
+              token:
+                type: string
+                example: admin user token
               stocked_title:
                 type: string
                 example: title
@@ -1693,10 +1704,13 @@ paths:
               }
         '400':
           description: "Bad Request - Title or content missing or process already exists"
+        '403':
+          description: Unauthorized.
         '409':
           description: "Bad Request - Language already exists"
         '500':
           description: "Internal Server Error - System error or error writing file"
+
   /admin/process/delete:
     get:
       description: Delete a process.
@@ -1705,9 +1719,15 @@ paths:
         - adminProcess
       parameters:
         - in: query
+          name: token
+          type: string
+          description: admin user token
+          required: true
+        - in: query
           name: stocked_title
           type: string
           description: Stocked_title of the process to delete.
+          required: true
       responses:
         '200':
           description: Process found!
@@ -1719,10 +1739,13 @@ paths:
               }
         '400':
           description: Missing parameters.
+        '403':
+          description: Unauthorized.
         '404':
           description: Process not found.
         '500':
           description: System error or Error deleting file.
+
   /admin/process/modify:
     post:
       description: "Modify the informations of a process for a given language."
@@ -1740,9 +1763,13 @@ paths:
           schema:
             type: object
             required:
+              - token
               - stocked_title
               - language
             properties:
+              token:
+                type: string
+                example: admin user token
               stocked_title:
                 type: string
                 example: stocked_title
@@ -1760,7 +1787,7 @@ paths:
                 example: New link
               delay:
                 type: string
-                example: "YYYY-MM-DD, For example the visa last one year so it's : 0001-00-00"
+                example: "YYYY-MM-DD, For example, the visa lasts one year, so it's: 0001-00-00"
       responses:
         '200':
           description: Result details
@@ -1774,10 +1801,13 @@ paths:
               }
         '400':
           description: "Bad Request - Missing parameters."
+        '403':
+          description: Unauthorized.
         '404':
           description: "Process not found."
         '500':
           description: "System error."
+
   /admin/process/get:
     get:
       description: "Get a process data."
@@ -1786,9 +1816,15 @@ paths:
         - adminProcess
       parameters:
         - in: query
+          name: token
+          type: string
+          description: admin user token
+          required: true
+        - in: query
           name: stocked_title
           type: string
           description: Stocked_title of the process to get.
+          required: true
       responses:
         '200':
           description: Process found!
@@ -1811,10 +1847,13 @@ paths:
             }
         '400':
           description: Missing parameters.
+        '403':
+          description: Unauthorized.
         '404':
           description: Process not found.
         '500':
           description: System error or error reading file.
+
   /admin/process/getLanguage:
     get:
       description: "Get a process languages."
@@ -1823,9 +1862,15 @@ paths:
         - adminProcess
       parameters:
         - in: query
+          name: token
+          type: string
+          description: admin user token
+          required: true
+        - in: query
           name: stocked_title
           type: string
           description: Stocked_title of the process to get.
+          required: true
       responses:
         '200':
           description: Process found!
@@ -1841,6 +1886,8 @@ paths:
             }
         '400':
           description: Missing parameters.
+        '403':
+          description: Unauthorized.
         '404':
           description: Process not found.
         '500':
@@ -1853,54 +1900,67 @@ paths:
         - adminStep
       parameters:
         - in: query
+          name: token
+          type: string
+          description: Authentication token
+          required: true
+        - in: query
           name: stocked_title
           type: string
-          description: Stocked_title of the process that contains to the target step.
+          description: Stocked_title of the process that contains the target step.
         - in: query
           name: step_id
           type: integer
           description: Id of the step.
       responses:
         '200':
-          description: Process found!
+          description: Steps found!
           schema:
             type: object
-            example:
-              {
-                "message": "Steps found!",
-                "stocked_title": "Visa",
-                "step":
-                [
-                  {
-                    "language": "english",
-                    "step_id": 4,
-                    "number": "1",
-                    "content": {
-                        "title": "Title",
-                        "type": "Document",
-                        "description": "Description.",
-                        "question": "Question",
-                        "source": "link",
-                        "underQuestions": [
-                          {
-                              "id": 0,
-                              "title": "Title",
-                              "type": "Document",
-                              "description": "Description.",
-                              "source": "link",
-                              "question": "question"
-                          }
-                        ]
-                      }
-                    }
-                ]
-              }
+            properties:
+              message:
+                type: string
+                example: 'Steps found!'
+              stocked_title:
+                type: string
+                example: 'Visa'
+              step:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    language:
+                      type: string
+                    step_id:
+                      type: integer
+                    number:
+                      type: string
+                    content:
+                      type: object
+                      properties:
+                        title:
+                          type: string
+                        type:
+                          type: string
+                        description:
+                          type: string
+                        question:
+                          type: string
+                        source:
+                          type: string
+                        underQuestions:
+                          type: array
+                          items:
+                            type: object
         '400':
           description: Missing parameters.
+        '403':
+          description: Unauthorized.
         '404':
-          description: Process, target step, steps or data not found
+          description: Process, target step, steps, or data not found.
         '500':
           description: System error.
+
   /admin/step/getAll:
     get:
       description: "Get all the steps of a given process and language."
@@ -1909,75 +1969,52 @@ paths:
         - adminStep
       parameters:
         - in: query
+          name: token
+          type: string
+          description: Authentication token
+          required: true
+        - in: query
           name: stocked_title
           type: string
           description: Stocked_title of the process concerned.
         - in: query
           name: language
           type: string
-          description: language to get.
+          description: Language to get.
       responses:
         '200':
-          description: Process found!
+          description: Steps found!
           schema:
             type: object
-            example:
-              {
-                "message": "Steps found!",
-                "stocked_title": "Test",
-                "steps": [
-                    {
-                        "id": 41,
-                        "title": "Determine the type of visa you need."
-                    },
-                    {
-                        "id": 42,
-                        "title": "Prepare your Passport"
-                    },
-                    {
-                        "id": 43,
-                        "title": "Fill the Visa application form"
-                    },
-                    {
-                        "id": 44,
-                        "title": "Take identity photos"
-                    },
-                    {
-                        "id": 45,
-                        "title": "Prepare your proof of accommodation"
-                    },
-                    {
-                        "id": 46,
-                        "title": "Preprare your proof of financial means"
-                    },
-                    {
-                        "id": 47,
-                        "title": "Preprare your proof of travel insurance"
-                    },
-                    {
-                        "id": 48,
-                        "title": "Purpose-specific documents"
-                    },
-                    {
-                        "id": 49,
-                        "title": "Schedule an appointment."
-                    },
-                    {
-                        "id": 50,
-                        "title": "Collect your visa."
-                    }
-                ]
-              }
+            properties:
+              message:
+                type: string
+                example: 'Steps found!'
+              stocked_title:
+                type: string
+                example: 'Test'
+              steps:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                    title:
+                      type: string
         '400':
           description: Missing parameters.
+        '403':
+          description: Unauthorized.
         '404':
-          description: Process, target step, steps or data not found
+          description: Process, target step, steps, or data not found.
         '500':
           description: System error.
+
   /admin/step/add:
     post:
-      description: "Add a step to every languages for a given process."
-      summary: "Add a step to every languages for a given process."
+      description: "Add a step to every language for a given process."
+      summary: "Add a step to every language for a given process."
       tags:
         - adminStep
       consumes:
@@ -1986,64 +2023,82 @@ paths:
         - application/json
       parameters:
         - in: body
-          name: Step
-          description: Add a step.
+          name: body
+          description: Request body
+          required: true
           schema:
             type: object
             required:
+              - token
               - stocked_title
               - newStep
               - language
             properties:
+              token:
+                type: string
+                example: 'your_auth_token'
               stocked_title:
                 type: string
-                example: stocked_title
+                example: 'stocked_title'
               delay:
                 type: string
-                example: "YYYY-MM-DD, For example the visa last one year so it's : 0001-00-00"
+                example: "YYYY-MM-DD, For example, the visa lasts one year so it's: 0001-00-00"
               newStep:
                 type: object
                 example:
-                  {
-                    "title": "title",
-                    "description": "description",
-                    "type": "type",
-                    "question": "question",
-                    "source": "url",
-                    "underQuestion": []
-                  }
+                  title: 'title'
+                  description: 'description'
+                  type: 'type'
+                  question: 'question'
+                  source: 'url'
+                  underQuestion: []
               is_unique:
                 type: boolean
-                example: True or false
+                example: true
       responses:
         '200':
-          description: Result details
+          description: Step added!
           schema:
             type: object
-            example:
-              {
-                "message": "Step added!",
-                "stocked_title": "Test",
-                "id": 51,
-                "step": {
-                    "title": "jvfvfv",
-                    "description": "testDescription",
-                    "type": "testType",
-                    "question": "xjsxs",
-                    "source": "testSource",
-                    "underQuestion": []
-                }
-              }
+            properties:
+              message:
+                type: string
+                example: 'Step added!'
+              stocked_title:
+                type: string
+                example: 'Test'
+              id:
+                type: integer
+              step:
+                type: object
+                properties:
+                  title:
+                    type: string
+                  description:
+                    type: string
+                  type:
+                    type: string
+                  question:
+                    type: string
+                  source:
+                    type: string
+                  underQuestions:
+                    type: array
+                    items:
+                      type: object
         '400':
           description: Missing parameters.
+        '403':
+          description: Unauthorized.
         '404':
-          description: Process, target step, steps, language or data not found
+          description: Process, target step, steps, language, or data not found.
         '500':
           description: System error or error writing file.
+
   /admin/step/modify:
     post:
-      description: "Modify the informations of a step for a given language."
-      summary: "Modify one step informations"
+      description: "Modify the information of a step for a given language."
+      summary: "Modify one step information"
       tags:
         - adminStep
       consumes:
@@ -2052,102 +2107,130 @@ paths:
         - application/json
       parameters:
         - in: body
-          name: Process
-          description: Modify the process informations.
+          name: body
+          description: Request body
+          required: true
           schema:
             type: object
             required:
+              - token
               - stocked_title
               - newStep
               - language
             properties:
+              token:
+                type: string
+                example: 'your_auth_token'
               stocked_title:
                 type: string
-                example: stocked_title
+                example: 'stocked_title'
               delay:
                 type: string
-                example: "YYYY-MM-DD, For example the visa last one year so it's : 0001-00-00"
+                example: "YYYY-MM-DD, For example, the visa lasts one year so it's: 0001-00-00"
               newStep:
                 type: object
                 example:
-                  {
-                    "title": "title",
-                    "description": "description",
-                    "type": "type",
-                    "question": "question",
-                    "source": "url",
-                    "underQuestion": []
-                  }
+                  title: 'title'
+                  description: 'description'
+                  type: 'type'
+                  question: 'question'
+                  source: 'url'
+                  underQuestion: []
               is_unique:
                 type: boolean
-                example: True or false
+                example: true
       responses:
         '200':
-          description: Result details
+          description: Step updated!
           schema:
             type: object
-            example:
-              {
-                "message": "Step updated!",
-                "stocked_title": "test",
-                "step": {
-                    "title": "New title",
-                    "type": "New type",
-                    "description": "New description",
-                    "question": "New auestion",
-                    "source": "New link",
-                    "underQuestions": [...]
-                }
-            }
+            properties:
+              message:
+                type: string
+                example: 'Step updated!'
+              stocked_title:
+                type: string
+                example: 'test'
+              step:
+                type: object
+                properties:
+                  title:
+                    type: string
+                  type:
+                    type: string
+                  description:
+                    type: string
+                  question:
+                    type: string
+                  source:
+                    type: string
+                  underQuestions:
+                    type: array
+                    items:
+                      type: object
         '400':
           description: Missing parameters.
+        '403':
+          description: Unauthorized.
         '404':
-          description: Process, target step, steps, language or data not found
+          description: Process, target step, steps, language, or data not found.
         '500':
           description: System error or error writing file.
+
   /admin/step/delete:
-      post:
-        description: "Delete a step for all the languages."
-        summary: "Delete a step for all the languages."
-        tags:
-          - adminStep
-        consumes:
-          - application/json
-        produces:
-          - application/json
-        parameters:
-          - in: body
-            name: Step
-            description: Step to delete.
-            schema:
-              type: object
-              required:
-                - stocked_title
-                - step_id
-              properties:
-                stocked_title:
-                  type: string
-                  example: stocked_title
-                step_id:
-                  type: integer
-                  example: 1
-        responses:
-          '200':
-            description: Result details
-            schema:
-              type: object
-              example:
-                {
-                  "message": "Step deleted!",
-                  "stocked_title": "Test",
-                  "step_id": "52"
-                }
-          '400':
-            description: Missing parameters.
-          '404':
-            description: Process, target step, steps, language or data not found
-          '500':
-            description: System error or error writing file.
+    post:
+      description: "Delete a step for all languages."
+      summary: "Delete a step for all languages."
+      tags:
+        - adminStep
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: body
+          name: body
+          description: Request body
+          required: true
+          schema:
+            type: object
+            required:
+              - token
+              - stocked_title
+              - step_id
+            properties:
+              token:
+                type: string
+                example: 'your_auth_token'
+              stocked_title:
+                type: string
+                example: 'stocked_title'
+              step_id:
+                type: integer
+                example: 1
+      responses:
+        '200':
+          description: Step deleted!
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+                example: 'Step deleted!'
+              stocked_title:
+                type: string
+                example: 'Test'
+              step_id:
+                type: integer
+                example: 52
+        '400':
+          description: Missing parameters.
+        '403':
+          description: Unauthorized.
+        '404':
+          description: Process, target step, steps, language, or data not found.
+        '500':
+          description: System error or error writing file.
   /admin/underStep/getAll:
     get:
       description: "Get all the under steps of a given step and language."
@@ -2156,180 +2239,196 @@ paths:
         - adminUnderStep
       parameters:
         - in: query
+          name: token
+          type: string
+          description: Authentication token
+          required: true
+        - in: query
           name: stocked_title
           type: string
           description: Stocked_title of the process concerned.
         - in: query
           name: language
           type: string
-          description: language to get.
+          description: Language to get.
       responses:
         '200':
-          description: Process found!
+          description: Steps found!
           schema:
             type: object
-            example:
-              {
-                "message": "Steps found!",
-                "stocked_title": "Test",
-                "step_id": "41",
-                "underSteps": [
-                    {
-                        "id": "0",
-                        "title": "jvfvfv"
-                    }
-                ]
-              }
+            properties:
+              message:
+                type: string
+                example: 'Steps found!'
+              stocked_title:
+                type: string
+                example: 'Test'
+              step_id:
+                type: string
+                example: '41'
+              underSteps:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: string
+                    title:
+                      type: string
         '400':
           description: Missing parameters.
+        '403':
+          description: Unauthorized.
         '404':
-          description: Process, target step, steps or data not found
+          description: Process, target step, steps, or data not found.
         '500':
           description: System error.
+
   /admin/underStep/add:
-      post:
-        description: "Add an under step to a existant step."
-        summary: "Add an under step to a existant step."
-        tags:
-          - adminUnderStep
-        consumes:
-          - application/json
-        produces:
-          - application/json
-        parameters:
-          - in: body
-            name: Under step
-            description: Under step to add.
-            schema:
-              type: object
-              required:
-                - stocked_title
-                - step_id
-                - newUnderStep
-              properties:
-                stocked_title:
-                  type: string
-                  example: stocked_title
-                step_id:
-                  type: integer
-                  example: 1
-                newUnderStep:
-                  type: object
-                  example:
-                    {
-                      "title": "title",
-                      "description": "description",
-                      "question": "question",
-                      "type": "type",
-                      "source": "url"
-                    }
-        responses:
+    post:
+      description: "Add an under step to an existent step."
+      summary: "Add an under step to an existent step."
+      tags:
+        - adminUnderStep
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: body
+          name: body
+          description: Request body
+          required: true
+          schema:
+            type: object
+            required:
+              - token
+              - stocked_title
+              - step_id
+              - newUnderStep
+            properties:
+              token:
+                type: string
+                example: 'your_auth_token'
+              stocked_title:
+                type: string
+                example: 'stocked_title'
+              step_id:
+                type: integer
+                example: 1
+              newUnderStep:
+                type: object
+                example:
+                  title: 'title'
+                  description: 'description'
+                  question: 'question'
+                  type: 'type'
+                  source: 'url'
+      responses:
           '200':
             description: Result details
             schema:
               type: object
               example:
-                {
-                  "message": "UnderStep added!",
-                  "stocked_title": "Test",
-                  "step_id": 41,
-                  "step": [
-                      {
-                          "title": "title",
-                          "type": "type",
-                          "description": "description",
-                          "question": "question",
-                          "source": "url",
-                          "underQuestions": [
-                              {
-                                  "title": "title",
-                                  "description": "description",
-                                  "question": "question",
-                                  "type": "type",
-                                  "source": "url",
-                                  "underQuestions": []
-                              }
-                          ]
-                      }
-                  ]
-                }
+                message: 'UnderStep added!'
+                stocked_title: 'Test'
+                step_id: 41
+                step:
+                  - title: 'title'
+                    type: 'type'
+                    description: 'description'
+                    question: 'question'
+                    source: 'url'
+                    underQuestions:
+                      - title: 'title'
+                        description: 'description'
+                        question: 'question'
+                        type: 'type'
+                        source: 'url'
+                        underQuestions: []
           '400':
             description: Missing parameters.
+          '403':
+            description: Unauthorized.
           '404':
-            description: Process, target step, steps, language or data not found
+            description: Process, target step, steps, language, or data not found.
           '500':
             description: System error or error writing file.
+
   /admin/underStep/modify:
-      post:
-        description: "Modify an under step for a given language."
-        summary: "Modify an under step for a given language."
-        tags:
-          - adminUnderStep
-        consumes:
-          - application/json
-        produces:
-          - application/json
-        parameters:
-          - in: body
-            name: Under step
-            description: Under step to modify.
-            schema:
-              type: object
-              required:
-                - stocked_title
-                - step_id
-                - underStep_id
-                - newUnderStep
-                - language
-              properties:
-                stocked_title:
-                  type: string
-                  example: stocked_title
-                step_id:
-                  type: integer
-                  example: 1
-                underStep_id:
-                  type: integer
-                  example: 1
-                newUnderStep:
-                  type: object
-                  example:
-                    {
-                      "title": "title",
-                      "description": "description",
-                      "question": "question",
-                      "type": "type",
-                      "source": "url"
-                    }
-                language:
-                  type: string
-                  example: "english"
-        responses:
-          '200':
-            description: Success
-            schema:
-              type: object
-              example:
-                {
-                  "message": "UnderStep modified!",
-                  "stocked_title": "Test",
-                  "step_id": 41,
-                  "underStep_id": 0,
-                  "step": {
-                      "title": "jesuisharrypotter",
-                      "description": "description",
-                      "question": "question",
-                      "type": "type",
-                      "source": "url",
-                      "underQuestions": []
-                  }
-                }
-          '400':
-            description: Missing parameters.
-          '404':
-            description: Process, target step, steps, language or data not found
-          '500':
-            description: System error or error writing file.
+    post:
+      description: "Modify an under step for a given language."
+      summary: "Modify an under step for a given language."
+      tags:
+        - adminUnderStep
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: body
+          name: body
+          description: Request body
+          required: true
+          schema:
+            type: object
+            required:
+              - token
+              - stocked_title
+              - step_id
+              - underStep_id
+              - newUnderStep
+              - language
+            properties:
+              token:
+                type: string
+                example: 'your_auth_token'
+              stocked_title:
+                type: string
+                example: 'stocked_title'
+              step_id:
+                type: integer
+                example: 1
+              underStep_id:
+                type: integer
+                example: 1
+              newUnderStep:
+                type: object
+                example:
+                  title: 'title'
+                  description: 'description'
+                  question: 'question'
+                  type: 'type'
+                  source: 'url'
+              language:
+                type: string
+                example: 'english'
+      responses:
+        '200':
+          description: Success
+          schema:
+            type: object
+            example:
+              message: 'UnderStep modified!'
+              stocked_title: 'Test'
+              step_id: 41
+              underStep_id: 0
+              step:
+                title: 'jesuisharrypotter'
+                description: 'description'
+                question: 'question'
+                type: 'type'
+                source: 'url'
+                underQuestions: []
+        '400':
+          description: Missing parameters.
+        '403':
+          description: Unauthorized.
+        '404':
+          description: Process, target step, steps, language, or data not found.
+        '500':
+          description: System error or error writing file.
+
   /admin/underStep/delete:
     get:
       description: "Get all the under steps of a given step and language."
@@ -2337,6 +2436,11 @@ paths:
       tags:
         - adminUnderStep
       parameters:
+        - in: query
+          name: token
+          type: string
+          description: Authentication token
+          required: true
         - in: query
           name: stocked_title
           type: string
@@ -2355,15 +2459,15 @@ paths:
           schema:
             type: object
             example:
-              {
-                "message": "UnderStep deleted!",
-                "stocked_title": "Test",
-                "step_id": "41",
-                "underStep_id": "0"
-              }
+              message: 'UnderStep deleted!'
+              stocked_title: 'Test'
+              step_id: '41'
+              underStep_id: '0'
         '400':
           description: Missing parameters.
+        '403':
+          description: Unauthorized.
         '404':
-          description: Process, target step, steps or data not found
+          description: Process, target step, steps, or data not found.
         '500':
           description: System error.
