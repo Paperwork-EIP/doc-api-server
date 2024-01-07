@@ -470,7 +470,7 @@ paths:
       summary: Login with oauth for mobile.
       tags:
         - user
-  /getUsers:
+  /user/getUsers:
     get:
       tags:
         - user
@@ -516,7 +516,7 @@ paths:
                 type: string
                 example: 'System error.'
 
-  /getUser:
+  /user/getUser:
     get:
       tags:
         - user
@@ -573,7 +573,7 @@ paths:
                 type: string
                 example: 'System error.'
 
-  /isAdmin:
+  /user/isAdmin:
     get:
       tags:
         - user
@@ -609,7 +609,7 @@ paths:
                 type: string
                 example: 'System error.'
 
-  /setAdmin:
+  /user/setAdmin:
     post:
       tags:
         - user
@@ -671,7 +671,7 @@ paths:
                 type: string
                 example: 'System error.'
 
-  /modifyUser:
+  /user/modifyUser:
     post:
       tags:
         - user
@@ -758,7 +758,7 @@ paths:
               message:
                 type: string
                 example: 'System error.'
-  /deleteUser:
+  /user/deleteUser:
     get:
       tags:
         - user
