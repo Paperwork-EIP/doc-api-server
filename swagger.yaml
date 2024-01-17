@@ -628,6 +628,8 @@ paths:
                 type: string
               email:
                 type: string
+              role:
+                type: string
       responses:
         200:
           description: Successful response
